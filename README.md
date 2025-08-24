@@ -3,9 +3,9 @@
 2- Number to word
 3- Replace ر at beginning with ڕ
 4- remove tatweel
-2- Tasks has been done by Mr.Tayb:
-    1- Punctuations.
-    2- AliK to Unicode
-    3- AliWeb to Unicode
-    4- Dylan to Unicode
-    5- Zarnegar to Unicode
+5- Tasks has been done by Mr.Tayb:
+    A- Punctuations.
+    B- AliK to Unicode
+    C- AliWeb to Unicode
+    D- Dylan to Unicode
+    E- Zarnegar to Unicode
