@@ -20,6 +20,7 @@ def Words2Numbers(text):
         for i in range(len(word)) :
             if word[i] in word_to_num: compl=''
             elif word[i][:-1] in word_to_num:word[i]=word[i][:-1]; compl='ێ'
+            elif word[i][:-2] in word_to_num:word[i]=word[i][:-2]; compl='یێ'
             
             if word[i] in word_to_num:                
                 value = word_to_num[word[i]]
@@ -48,7 +49,7 @@ def Words2Numbers(text):
         if  re.search(' ژ 100ێ',lines):lines = re.sub(' ژ 100ێ', '%', lines)
         if  re.search('سالب ',lines):lines = re.sub('سالب ', r'-', lines)
         if re.search(r'(-?\d+)(\s*)(ل سەر)(\s*)(\d+)(ێ?)',lines):# problem with 8 and 7 it convert it to 80 and 70
-            lines=re.sub(r'(-?\d+)(\s*)(ل سەر)(\s*)(\d+)(ێ?)',r'\1\\\5' , lines) 
+            lines=re.sub(r'(-?\d+)(\s*)(ل سەر)(\s*)(\d+)(ێ?)',r'\1/\5' , lines) 
         finalresult.append(lines)
     return '\n'.join(finalresult)
 
@@ -74,6 +75,21 @@ _hundred = "سەد"
 _negative = "سالب"
 _connector = "و"
 _point = "پوینت"
+
+kurdishMonths={
+    'ئادارا':3,
+    'نیسانا':4,
+    'گولانا':5,
+    'خزیرانا':6,
+    'تیرمەها':7,
+    'تەباخا':8,
+    'ئەیلوولا':9,
+    'چرییا ئێکێیا':10,
+    'چرییا دوویێیا':11,
+    'کانوونا ئێکێیا':12,
+    'کانوونا دوویێیا':1,
+    'شوباتا':2
+    }
 
 # --- Core Conversion Functions ---
 def _convert_less_than_thousand(number):
@@ -129,13 +145,19 @@ def process_text_by_line(text, convert_negatives=False, convert_decimals=False):
     return "\n".join(processed_lines)
 
 def _convert_numbers_in_line(line, convert_negatives, convert_decimals):
-    if re.search(r'/',line):
+    if re.search(r'(\d+)(/)(\d+)(/)(\d+)',line):
+        for key, value in kurdishMonths.items():
+            matches = re.findall(r'/(\d+)/', line)
+            if len(matches)>0:
+                if value == int(matches[0]):
+                    line = re.sub(r'(\d+)(/)(\d+)(/)(\d+)',rf'\1یێ {key} سالا \5ێ' , line)
+    elif re.search(r'/',line):
         line = re.sub(r'(-?\d+)(/)(\d+)',r'\1 ل سەر \3ێ' , line) 
-        print(line)
-        #line = re.sub(r'(-?\d+)/(\d+)',r'(-?\d+)/(\d+)' , line)
-        #line = re.sub(r'(-?\d+)/(\d+)', lambda m: _replace_standalone(m, convert_negatives), line)
-        #line = re.sub(r'/', 'ل سەر ', line)
         
+    if re.search(r'(\d+)(:)(\d+)(:)(\d+)',line): 
+        line = re.sub(r'(\d+)(:)(\d+)(:)(\d+)',r'دەمژمێر \1 و \3 خولەک و \5 چرکە' , line) 
+    elif re.search(r'(\d+)(:)(\d+)',line): 
+        line = re.sub(r'(\d+)(:)(\d+)',r'دەمژمێر \1 و \3 خولەک ' , line) 
     if convert_decimals:
         line = re.sub("([0-9]{1,3})[,،](?=[0-9]{3})", r"\1", line)  # remove thousand separator 12,345,678 => 12345678
         line = re.sub(r'(-?\d+)\.(\d+)\s*([$%])?', lambda m: _replace_decimal(m, convert_negatives), line)
@@ -192,6 +214,10 @@ if __name__ == "__main__":
 110%
 ٣/٨٠
 67/886
+١٥/١/١٩٩١
+15/01/1991
+12:4:05
+03:6
 ژمارا بەشداربویان -365 کەس بوون."""
     
 
@@ -202,8 +228,8 @@ if __name__ == "__main__":
     print(f"\nOriginal Paragraph:\n{sample_paragraph}")
 
     print("\n--- All Options Enabled ---")
-    converted_paragraph = process_text_by_line(sample_paragraph, True, True)
-    print(converted_paragraph)
+   # converted_paragraph = process_text_by_line(sample_paragraph, True, True)
+   # print(converted_paragraph)
     
     text = '''
     پروژەک هاتە ڤەکرن ب کوژمێ چار ملیون و هەفتسەد و سیهـ و پێنج هزار و دووسەد و هەشتێ و سێ ل پارێزگەها دهوکێ 
@@ -220,5 +246,5 @@ if __name__ == "__main__":
 
     '''
     print("\n--- Words to Numbers ---")
-    converted = Words2Numbers(converted_paragraph)
-    print(converted)
+   # converted = Words2Numbers(converted_paragraph)
+    #print(converted)
