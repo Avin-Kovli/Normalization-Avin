@@ -2,7 +2,7 @@
 1- Word to Number
 2- Number to word
 3- Replace ر at beginning with ڕ
-4-
+4- remove tatweel
 2- Tasks has been done by Mr.Tayb:
     1- Punctuations.
     2- AliK to Unicode
